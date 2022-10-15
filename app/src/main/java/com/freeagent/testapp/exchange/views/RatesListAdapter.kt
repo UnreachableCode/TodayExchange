@@ -1,4 +1,4 @@
-package com.freeagent.testapp
+package com.freeagent.testapp.exchange.views
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

@@ -1,9 +1,10 @@
-package com.freeagent.testapp
+package com.freeagent.testapp.exchange.views
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
+import com.freeagent.testapp.R
 import com.freeagent.testapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
