@@ -4,6 +4,9 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.freeagent.testapp.exchange.restclient.FixerApi
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 class RatesListViewModel : ViewModel() {
@@ -17,7 +20,7 @@ class RatesListViewModel : ViewModel() {
 
     private val _lastValueEntered: String = "0"
 
-    @Bindable
+    //@Bindable (baseObservable?)
     fun getCurrencyAmountText(): String {
         return _baseCurrencyAmount.toString() //todo: Check how to format this to a scale:2 string for the UI.
     }
@@ -39,6 +42,9 @@ class RatesListViewModel : ViewModel() {
     //Ambiguity - is this one API call that is processed, or an API call made as the user types? Latter seems sleeker.
     //AC: fetch only these currencies: " USD, EUR, JPY, GBP, AUD, CAD, CHF, CNY, SEK, NZD. All exchange rates should use EUR as a base currency."
     private fun getExchangeRatesForCurrentDate() {
-
+        viewModelScope.launch {
+            val results = FixerApi.retroFitService.getFollowingRatesForTimeseries()
+            print(results)
+        }
     }
 }
