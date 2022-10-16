@@ -1,5 +1,6 @@
 package com.freeagent.testapp.exchange.viewmodels
 
+import android.os.Build
 import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.freeagent.testapp.exchange.restclient.FixerApi
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import java.time.LocalDate
 
 class RatesListViewModel : ViewModel() {
     //Todo: Eventually going to have a list of exchange objects from the api
@@ -19,6 +21,15 @@ class RatesListViewModel : ViewModel() {
     val baseCurrencyAmount: LiveData<BigDecimal> = _baseCurrencyAmount
 
     private val _lastValueEntered: String = "0"
+
+    private val today: String = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        LocalDate.now().toString()
+    } else { //Test this, e.g. on Android 7.
+        "todo"
+    }
+
+    private val baseCurrency = "EUR"
+    private val testCurrencies = "USD, EUR, JPY, GBP, AUD, CAD, CHF, CNY, SEK, NZD"
 
     //@Bindable (baseObservable?)
     fun getCurrencyAmountText(): String {
@@ -43,7 +54,10 @@ class RatesListViewModel : ViewModel() {
     //AC: fetch only these currencies: " USD, EUR, JPY, GBP, AUD, CAD, CHF, CNY, SEK, NZD. All exchange rates should use EUR as a base currency."
     private fun getExchangeRatesForCurrentDate() {
         viewModelScope.launch {
-            val results = FixerApi.retroFitService.getFollowingRatesForTimeseries()
+            val start = today
+            val end = today
+
+            val results = FixerApi.retroFitService.getFollowingRatesForTimeseries(start, end, baseCurrency, testCurrencies)
             print(results)
         }
     }
