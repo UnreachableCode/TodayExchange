@@ -50,15 +50,21 @@ class RatesListViewModel : ViewModel() {
     }
 
 
+
     //Ambiguity - is this one API call that is processed, or an API call made as the user types? Latter seems sleeker.
     //AC: fetch only these currencies: " USD, EUR, JPY, GBP, AUD, CAD, CHF, CNY, SEK, NZD. All exchange rates should use EUR as a base currency."
     private fun getExchangeRatesForCurrentDate() {
         viewModelScope.launch {
-            val start = today
-            val end = today
+            try {
+                val date = today
 
-            val results = FixerApi.retroFitService.getFollowingRatesForTimeseries(start, end, baseCurrency, testCurrencies)
-            print(results)
+                val results = FixerApi.retroFitService.getFollowingRatesForDate(date, baseCurrency, testCurrencies)
+                print(results)
+            } catch (e: Exception) {
+                //We will display a network error banner this way.
+                print(e.message)
+            }
+            //todo: Remember to catch a timeout
         }
     }
 }
