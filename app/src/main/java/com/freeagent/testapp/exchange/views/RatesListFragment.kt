@@ -16,7 +16,6 @@ class RatesListFragment : Fragment() {
     private val ratesListAdapter = RatesListAdapter()
     private val viewModel: RatesListViewModel by viewModels()
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

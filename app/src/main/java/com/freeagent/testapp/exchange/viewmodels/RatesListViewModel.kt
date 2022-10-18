@@ -1,12 +1,13 @@
 package com.freeagent.testapp.exchange.viewmodels
 
+import android.content.ClipData.Item
 import android.os.Build
-import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.freeagent.testapp.exchange.restclient.FixerApi
+import com.freeagent.testapp.exchange.restclient.FixerDateRates
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -31,6 +32,12 @@ class RatesListViewModel : ViewModel() {
     private val baseCurrency = "EUR"
     private val testCurrencies = "USD, EUR, JPY, GBP, AUD, CAD, CHF, CNY, SEK, NZD"
 
+    private lateinit var cachedResults: FixerDateRates
+
+    val viewData: LiveData<List<ItemViewModel>>
+        get() = _viewData
+    private val _viewData = MutableLiveData<List<ItemViewModel>>(emptyList())
+
     //@Bindable (baseObservable?)
     fun getCurrencyAmountText(): String {
         return _baseCurrencyAmount.toString() //todo: Check how to format this to a scale:2 string for the UI.
@@ -46,9 +53,16 @@ class RatesListViewModel : ViewModel() {
     }
 
     init {
-        getExchangeRatesForCurrentDate()
+        val fixerDateRates = getExchangeRatesForCurrentDate()
     }
 
+    private fun formatStandardModeViewData(fixerDateRates: FixerDateRates): List<ItemViewModel> {
+        val normalViewData = mutableListOf<ItemViewModel>()
+        cachedResults?.rates.forEach { (key, value) ->
+            normalViewData.add(StandardExchangeItemViewModel(key, value))
+        }
+        return normalViewData;
+    }
 
 
     //Ambiguity - is this one API call that is processed, or an API call made as the user types? Latter seems sleeker.
@@ -57,14 +71,23 @@ class RatesListViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val date = today
+                cachedResults = FixerApi.retroFitService.getFollowingRatesForDate(date, baseCurrency, testCurrencies)
 
-                val results = FixerApi.retroFitService.getFollowingRatesForDate(date, baseCurrency, testCurrencies)
-                print(results)
+                val normalModeViewData = formatStandardModeViewData(cachedResults)
+
+                _viewData.postValue(normalModeViewData)
+
             } catch (e: Exception) {
                 //We will display a network error banner this way.
                 print(e.message)
             }
             //todo: Remember to catch a timeout
         }
+    }
+
+    companion object {
+        const val STANDARD_ITEM = 0
+        const val HEADER_ITEM = 1
+        const val COMPARISON_ITEM = 2
     }
 }

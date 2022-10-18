@@ -25,6 +25,11 @@ private val retrofit = Retrofit.Builder()
     .baseUrl(BASE_URL)
     .build()
 
+/*
+Had really intended to use this one call, one time for a 5 day timespan and then do everything else offline.
+But as it's my first time using Moshi, I couldn't quite figure out how to use the adapters to transform
+the JSON from this call into usable objects. So I had to u-turn on this and use the date endpoint instead.
+*/
 interface FixerApiService {
     @Headers("apikey: $API_KEY")
     @GET("fixer/timeseries")
