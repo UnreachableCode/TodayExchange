@@ -13,7 +13,7 @@ interface ItemViewModel {
 }
 
 class StandardExchangeItemViewModel(val currency: String,
-                                    val value: Double) : ItemViewModel {
+                                    val conversionVal: String) : ItemViewModel {
     override val layoutId: Int = R.layout.item_view_currency
     override val viewType: Int = RatesListViewModel.STANDARD_ITEM
 }
